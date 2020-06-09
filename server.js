@@ -15,20 +15,6 @@ const server = express();
 
 server.use(express.json());
 
-server.get('/presente', async function(request, response) {
-    const result = await pool.query('SELECT * FROM presente');
-    return response.json(result.rows);
-})
-
-server.post('/presente', async function(request, response) {
-    const nome_produto = request.body.nome_produto;
-    const valor = request.body.valor;
-    const destinatario = request.body.destinatario;
-    const sql = `INSERT INTO presente (nome_produto, valor, destinatario) VALUES ($1, $2, $3)`;
-    await pool.query(sql, [nome_produto, valor, destinatario]);
-    return response.status(204).send();
-})
-
 //const produtos = [
 //    {id: 1, nome_produto: 'Copo Térmico Homem de Ferro', valor: 40.94, destinatario: 'Luis Gustavo Bruneri'},
 //    {id: 2, nome_produto: 'Controle PS4', valor: 215.90, destinatario: 'Luis Gustavo Bruneri'},
@@ -82,5 +68,47 @@ server.post('/presente', async function(request, response) {
 //        }
 //        return response.status(204).send();
 //    })
+
+server.get('/presente', async function(request, response) {
+    const result = await pool.query('SELECT * FROM presente');
+    return response.json(result.rows);
+})
+
+server.get('/presente/:id', async function(request, response){
+    const id = request.params.id;
+    const sql = `SELECT * FROM presente WHERE id = $1`;
+    const result = await pool.query(sql, [id]);
+    return response.json(result.rows);
+})
+
+server.get('/presente/search', async function(request, response){
+    const nome_produto = request.query.nome_produto;
+    const sql = `SELECT * FROM presente WHERE nome_produto ILIKE $1`;
+    const result = await pool.query(sql, ["%" + nome_produto + "%"]);
+    return response.json(result.rows);
+})
+
+server.post('/presente', async function(request, response) {
+    const {nome_produto, valor, destinatario} = request.body;
+    const sql = `INSERT INTO presente (nome_produto, valor, destinatario) VALUES ($1, $2, $3)`;
+    await pool.query(sql, [nome_produto, valor, destinatario]);
+    return response.status(204).send();
+})
+
+server.delete('/presente/:id', async function(request, response){
+    const id = request.params.id;
+    const sql = `DELETE FROM tarefas WHERE id = $1`;
+    await pool.query(sql, [id]);
+    return response.status(204).send();
+})
+
+server.put('/presente/:id', async function(request, response){
+    const id = request.params.id;
+    const {nome_produto, valor, destinatario} = request.body;
+    const sql = 'UPDATE presente SET nome_produto = $1, valor = $2, destinatario = $3 WHERE id = $4';
+    await pool.query(sql, [nome_produto, valor, destinatario, id]);
+    return response.status(204).send();
+})
+
 
 server.listen(process.env.PORT || 3000);
