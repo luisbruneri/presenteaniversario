@@ -97,7 +97,7 @@ server.post('/presente', async function(request, response) {
 
 server.delete('/presente/:id', async function(request, response){
     const id = request.params.id;
-    const sql = `DELETE FROM tarefas WHERE id = $1`;
+    const sql = `DELETE FROM presente WHERE id = $1`;
     await pool.query(sql, [id]);
     return response.status(204).send();
 })
