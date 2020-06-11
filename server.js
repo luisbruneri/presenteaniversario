@@ -76,6 +76,7 @@ server.get('/presente', async function(request, response) {
     return response.json(result.rows);
 })
 
+
 server.get('/presente/:id', async function(request, response){
     const id = request.params.id;
     const sql = `SELECT * FROM presente WHERE id = $1`;
